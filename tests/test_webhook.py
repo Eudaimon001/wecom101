@@ -1,9 +1,12 @@
 import os
 
-from wecom.wecomwebhook import WecomWebhook
+from wecom import WecomWebhook
 
 
 class TestWecomWebhook:
+    """
+    Webhook机器人只能在内部群聊里建立
+    """
     def setup_class(self):
         self.wecom = WecomWebhook(os.environ['WEBHOOK_BOT_KEY'])
 
