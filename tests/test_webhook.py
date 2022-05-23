@@ -5,7 +5,7 @@ from wecom.wecomwebhook import WecomWebhook
 
 class TestWecomWebhook:
     def setup_class(self):
-        self.wecom = WecomWebhook(os.environ['WEBHOOK_URL'])
+        self.wecom = WecomWebhook(os.environ['WEBHOOK_BOT_KEY'])
 
     def test_send_text(self):
         response = self.wecom.send('Hello everybody!')
@@ -37,5 +37,11 @@ class TestWecomWebhook:
              '> \n' \
              '>如需修改会议信息，请点击：[修改会议信息](https://work.weixin.qq.com)'
         response = self.wecom.send(md, msgtype='markdown', mentioned_mobile_list=[os.environ['MY_MOBILE']])
+        assert response['errcode'] == 0
+        assert response['errmsg'] == 'ok'
+
+    def test_upload_file(self):
+        file_path = os.path.join(os.path.dirname(__file__), '上传文件数量汇总.xlsx')
+        response = self.wecom.upload_file(file_path)
         assert response['errcode'] == 0
         assert response['errmsg'] == 'ok'
