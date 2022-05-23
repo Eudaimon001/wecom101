@@ -16,7 +16,7 @@ class TestWecomWebhook:
         assert response['errmsg'] == 'ok'
 
     def test_send_mentioned_text(self):
-        response = self.wecom.send('Hello, ', mentioned_list=['wuhan', '@all'])
+        response = self.wecom.send('Hello, ', mentioned_list=[os.environ['USER_ID'], '@all'])
         assert response['errcode'] == 0
         assert response['errmsg'] == 'ok'
 

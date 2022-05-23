@@ -11,7 +11,7 @@ class WecomAgent:
 
     def get_access_token(self):
         r = redis.StrictRedis(host='localhost', port=6379, db=0, decode_responses=True)
-        access_token = r.get('token')
+        access_token = r.get('wecom_agent_token')
 
         if access_token is None or len(access_token) == 0:
             get_token_url = f"https://qyapi.weixin.qq.com/cgi-bin/gettoken"

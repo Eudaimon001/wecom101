@@ -14,6 +14,6 @@ class TestWecomAgent:
                                 agent_id=os.environ['AGENT_ID'])
 
     def test_send_text(self):
-        response = self.wecom.send('Hello world!', 'WuHan')
+        response = self.wecom.send('Hello world!', os.environ['USER_ID'])
         assert response['errcode'] == 0
         assert response['errmsg'] == 'ok'
