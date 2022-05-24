@@ -3,8 +3,7 @@ import os
 
 from flask import Flask, request
 
-from wecom.aes import AES256CTR
-from wecom import validate_sig, url_decode
+from wecom import url_decode, WeComMsgCrypt
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(filename)s:%(funcName)s %(levelname)-7s %(message)s")
 
@@ -20,12 +19,15 @@ def index():
 def api():
     args = request.args.to_dict()
     args = url_decode(args)
-    if validate_sig(args, os.environ['CALLBACK_TOKEN']):
-        aes_key = os.environ['CALLBACK_ENCODING_AES_KEY'] + "="
-        aes_msg = args['echostr']
-        rand_msg = AES256CTR(aes_key).decrypt(aes_msg)
-    else:
-        pass
+    msg_crypt = WeComMsgCrypt(
+        sToken=os.environ['CALLBACK_TOKEN'],
+        sEncodingAESKey=os.environ['CALLBACK_ENCODING_AES_KEY'],
+        sReceiveId=os.environ['CORP_ID']
+    )
+    ret, result = msg_crypt.VerifyURL(sMsgSignature=args['msg_signature'], sTimeStamp=args['timestamp'],
+                                      sNonce=args['nonce'], sEchoStr=args['echostr'])
+    status_code = 200 if ret == 0 else 400
+    return result, status_code
 
 
 if __name__ == "__main__":
