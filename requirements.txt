@@ -2,3 +2,5 @@ python-dotenv
 pytest
 redis
 requests
+flask
+pycryptodome
