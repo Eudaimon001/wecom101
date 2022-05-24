@@ -1,3 +1,4 @@
+import base64
 import os
 import shutil
 
@@ -6,10 +7,12 @@ import requests
 
 
 class WeDrive:
-    def __init__(self, corp_id, wedrive_secret):
+    def __init__(self, corp_id, wedrive_secret, user_id, space_id):
         self.corp_id = corp_id
         self.wedrive_secret = wedrive_secret
         self.access_token = self.get_access_token()
+        self.user_id = user_id
+        self.space_id = space_id
 
     def get_access_token(self):
         r = redis.StrictRedis(host='localhost', port=6379, db=0, decode_responses=True)
@@ -25,24 +28,24 @@ class WeDrive:
 
         return access_token
 
-    def get_file_list(self, user_id, space_id, sort_type=6, start=0, limit=1000):
+    def get_file_list(self, sort_type=6, start=0, limit=1000):
         response = requests.post('https://qyapi.weixin.qq.com/cgi-bin/wedrive/file_list',
                                  params={'access_token': self.access_token},
                                  json={
-                                     'userid': user_id,
-                                     'spaceid': space_id,
-                                     'fatherid': space_id,
+                                     'userid': self.user_id,
+                                     'spaceid': self.space_id,
+                                     'fatherid': self.space_id,
                                      'sort_type': sort_type,
                                      'start': start,
                                      'limit': limit
                                  }).json()
         return response
 
-    def download(self, user_id, file_info, download_dir_path):
+    def download(self, file_info, download_dir_path):
         response = requests.post('https://qyapi.weixin.qq.com/cgi-bin/wedrive/file_download',
                                  params={'access_token': self.access_token},
                                  json={
-                                     'userid': user_id,
+                                     'userid': self.user_id,
                                      'fileid': file_info['fileid'],
                                  }).json()
         download_url = response['download_url']
@@ -53,3 +56,18 @@ class WeDrive:
             with open(local_file_path, 'wb') as f:
                 shutil.copyfileobj(r.raw, f)
         return local_file_path
+
+    def upload(self, upload_file_path):
+        with open(upload_file_path, "rb") as f:
+            data = f.read()
+            encoded = base64.b64encode(data)
+            response = requests.post('https://qyapi.weixin.qq.com/cgi-bin/wedrive/file_upload',
+                                     params={'access_token': self.access_token},
+                                     json={
+                                         "userid": self.user_id,
+                                         "spaceid": self.space_id,
+                                         "fatherid": self.space_id,
+                                         "file_name": os.path.basename(upload_file_path),
+                                         "file_base64_content": encoded.decode()
+                                     })
+            return response

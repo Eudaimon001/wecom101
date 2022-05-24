@@ -44,7 +44,7 @@ class TestWecomWebhook:
         assert response['errmsg'] == 'ok'
 
     def test_upload_file(self):
-        file_path = os.path.join(os.path.dirname(__file__), '上传文件数量汇总.xlsx')
+        file_path = os.path.join(os.path.dirname(__file__), '测试文件.xlsx')
         response = self.wecom.upload_file(file_path)
         assert response['errcode'] == 0
         assert response['errmsg'] == 'ok'
