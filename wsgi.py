@@ -33,7 +33,7 @@ def api_get():
 @app.route("/api", methods=["POST"])
 def api_post():
     args = request.args.to_dict()
-    content = request.get_data().decode()
+    content = request.get_data(as_text=True)
     logging.info(args)
     logging.info(content)
 
