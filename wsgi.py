@@ -4,6 +4,9 @@ import os
 from flask import Flask, request
 
 from wecom import url_decode, WeComMsgCrypt
+from dotenv import load_dotenv
+
+load_dotenv()
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(filename)s:%(funcName)s %(levelname)-7s %(message)s")
 
