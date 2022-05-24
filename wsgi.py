@@ -1,5 +1,6 @@
 import logging
 import os
+import time
 
 from flask import Flask, request
 
@@ -32,8 +33,22 @@ def api_get():
 @app.route("/api", methods=["POST"])
 def api_post():
     args = request.args.to_dict()
-    content = request.get_data()
-    logging.info(args, content)
+    content = request.get_data().decode()
+    logging.info(args)
+    logging.info(content)
+
+    ret, msg = msg_crypt.DecryptMsg(sPostData=content, sMsgSignature=args['msg_signature'],
+                                    sTimeStamp=args['timestamp'], sNonce=args['nonce'])
+    if ret == 0:
+        logging.info(msg.decode())
+        timestamp = str(int(time.time() * 1000))
+        reply_msg = '<xml><FromUserName><![CDATA[wwbdd7609be778bb8d]]></FromUserName><ToUserName><![CDATA[WuHan]]></ToUserName><CreateTime>1653387275</CreateTime><MsgType><![CDATA[text]]></MsgType><Content><![CDATA[hi]]></Content><MsgId>7101244275920854292</MsgId><AgentID>1000006</AgentID></xml>'
+        ret, encrypted_msg = msg_crypt.EncryptMsg(reply_msg, timestamp, timestamp)
+        logging.info(encrypted_msg)
+    else:
+        encrypted_msg = ''
+    status_code = 200 if ret == 0 else 400
+    return encrypted_msg, status_code
 
 
 if __name__ == "__main__":
